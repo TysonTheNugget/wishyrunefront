@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Wishy Rune Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
       --main-color: #C4A2CC;
@@ -28,22 +29,30 @@
     }
 
     h1 {
-      font-size: 2.8em;
+      font-size: 2.5em;
       color: var(--text-color);
       margin-bottom: 30px;
       text-shadow: 1px 1px 0px #fff;
+      text-align: center;
     }
 
     .input-group {
-      margin-bottom: 25px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 15px;
+      gap: 16px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .input-row {
+      width: 100%;
+      display: flex;
+      gap: 10px;
     }
 
     input {
-      width: 320px;
+      flex: 1;
       padding: 14px 20px;
       font-size: 16px;
       border: 3px solid transparent;
@@ -66,7 +75,7 @@
     }
 
     button {
-      padding: 12px 28px;
+      padding: 12px 20px;
       background: var(--main-dark);
       color: white;
       font-weight: bold;
@@ -74,6 +83,7 @@
       border: none;
       border-radius: 999px;
       cursor: pointer;
+      white-space: nowrap;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       transition: background 0.2s ease;
     }
@@ -98,9 +108,18 @@
       text-align: left;
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 500px) {
+      h1 {
+        font-size: 2em;
+      }
+
+      .input-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
       input, button {
-        width: 90%;
+        width: 100%;
       }
     }
   </style>
@@ -109,7 +128,10 @@
   <h1>Wishy Rune Tracker</h1>
 
   <div class="input-group">
-    <input id="btcAddress" placeholder="Enter BTC address..." />
+    <div class="input-row">
+      <input id="btcAddress" placeholder="Enter BTC address..." />
+      <button onclick="pasteAddress()">Paste</button>
+    </div>
     <input id="runeName" placeholder="DOG•GO•TO•THE•MOON" />
     <button onclick="fetchRune()">Analyze Rune</button>
   </div>
@@ -119,12 +141,25 @@
   <script>
     const runeInput = document.getElementById("runeName");
 
-    // Auto-uppercase with visible bullet for spaces
+    // Show rune as uppercase with dots
     runeInput.addEventListener("input", () => {
       const realText = runeInput.value.toUpperCase();
       const displayText = realText.replace(/ /g, "•");
       runeInput.value = displayText;
     });
+
+    async function pasteAddress() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text.startsWith("bc1")) {
+          document.getElementById("btcAddress").value = text;
+        } else {
+          alert("Clipboard doesn't contain a valid BTC address.");
+        }
+      } catch (err) {
+        alert("Clipboard access failed. Try pasting manually.");
+      }
+    }
 
     function formatNumber(x, decimals = 0) {
       return Number(x).toLocaleString("en-US", {
